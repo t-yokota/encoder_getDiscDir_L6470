@@ -151,7 +151,7 @@ void loop() {
                                 }else{
                                         slitCount += 1;
                                         digitalWrite(PIN_LED, HIGH);
-                                        delay(100);
+                                        delay(1);
                                         digitalWrite(PIN_LED, LOW);                                        
                                 }                        
                                 Serial.print( "slit: " ); Serial.print( slitCount ); Serial.print( ", " );

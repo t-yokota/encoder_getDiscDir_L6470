@@ -22,7 +22,7 @@ unsigned long falseTime;
 
 boolean initBool;
 unsigned int elemCount;
-const int numElem =  ( numSlit + 1 ) * 2;
+const int numElem =  ( numSlit + 1 ) * 10;
 unsigned long falseMin[ numElem ];
 unsigned long falseMax[ numElem ];
 unsigned long trueArray[ numElem ];

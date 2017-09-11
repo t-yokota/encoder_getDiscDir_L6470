@@ -72,7 +72,7 @@ void loop() {
                                 trueEnd = micros(); 
                                 trueTime = trueEnd - trueSrt;
                                 trueArray[ elemCount ] = trueTime;
-                        }
+                                }
                         if( encVal2_cr == true ){ // end slit area
                                 trueSrt = micros();
                                 falseEnd = micros();
@@ -86,11 +86,11 @@ void loop() {
                                         falseMax[0] = falseTime;
                                 }else if( slitCount <= numElem ){
                                         elemCount  += 1;
-                                        if ( falseTime > falseMax[ elemCount -1 ] ){
+                                        if ( falseTime > falseMax[ elemCount -1 ] * 0.8){
                                                 falseMax[ elemCount ] = falseTime;
                                                 falseMin[ elemCount ] = falseMin[ elemCount - 1 ];                                                
                                         }
-                                        if ( falseTime < falseMax[ elemCount -1 ] ){
+                                        if ( falseTime < falseMax[ elemCount -1 ] * 0.8){
                                                 falseMin[ elemCount ] = falseTime;
                                                 falseMax[ elemCount ] = falseMax[ elemCount - 1 ];        
                                         }
@@ -98,7 +98,7 @@ void loop() {
                                         slitCount = 0;
                                         elemCount = 0;                                        
                                         initBool = false;
-                                        Serial.println("");
+                                        Serial.println(""); Serial.println("");
                                         Serial.println( "falseMin: "  );
                                         for( int i = 0; i < numElem; i++ ){
                                                 Serial.println( falseMin[ i ] );
@@ -107,10 +107,10 @@ void loop() {
                                         for( int i = 0; i < numElem; i++ ){
                                                 Serial.println( falseMax[ i ] );
                                         }
-                                        Serial.println( "tureTime: " ); 
-                                        for( int i = 0; i < numElem; i++ ){
-                                                Serial.println( trueArray[ i ] );
-                                        }                                        
+                                        // Serial.println( "tureTime: " ); 
+                                        // for( int i = 0; i < numElem; i++ ){
+                                        //         Serial.println( trueArray[ i ] );
+                                        // }                                        
                                         unsigned long _falseMin[ numElem - ( numSlit + 1 ) ]; // except first rotation
                                         unsigned long _falseMax[ numElem - ( numSlit + 1 ) ]; // except first rotation
                                         for( int i = 0; i < numElem - ( numSlit + 1 ); i++ ){

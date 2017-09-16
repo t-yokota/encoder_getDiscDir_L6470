@@ -118,8 +118,8 @@ void loop() {
                                                 //}
                                                 float falseNrrwStd = stdev( falseNrrw, numElem ); // standard deviation
                                                 float falseWidStd = stdev( falseWid, numElem ); // standard deviation
-                                                falseNrrwAve = exOutMean( falseNrrw, falseNrrwStd, numElem ); // mean except outliers
-                                                falseWidAve = exOutMean( falseWid, falseWidStd, numElem ); // mean except outliers
+                                                falseNrrwAve = exoutMean( falseNrrw, falseNrrwStd, numElem ); // mean except outliers
+                                                falseWidAve = exoutMean( falseWid, falseWidStd, numElem ); // mean except outliers
                                                 slitThd = sqrt( falseWidAve / falseNrrwAve );
                                                 Serial.println("falseNrrwStd: "); Serial.println( falseNrrwStd );
                                                 Serial.println("falseNrrwAve: "); Serial.println( falseNrrwAve );
@@ -189,11 +189,11 @@ float stdev( unsigned long x[], int xlength ){
         return std = sqrt(var);
 }
 
-float exOutMean ( unsigned long x[], float xstdev, int xlength ){
+float exoutMean ( unsigned long x[], float xstdev, int xlength ){
         // except outliers mean
         unsigned long sum = 0;
         float ave = mean( x, xlength );
-        //float exOutAve = 0;
+        //float exoutAve = 0;
         int n = 0;
         for( int i = 0; i < xlength; i++ ){
                 if( abs( (float)x[ i ] - ave ) <= 2*xstdev ){

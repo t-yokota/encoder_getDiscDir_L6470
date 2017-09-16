@@ -5,7 +5,7 @@
 # define PIN_BUSY 9
 # define PIN_LED 13
 
-const int numSlit = 6;
+const int numSlit = 8;
 
 boolean encVal1_cr;
 boolean encVal1_prv;
@@ -22,7 +22,7 @@ unsigned long falseTime;
 
 boolean initBool;
 unsigned int elemCount;
-const int numElem =  ( numSlit + 1 ) * 10;
+const int numElem =  ( numSlit + 1 ) * 5;
 unsigned long falseMin[ numElem ];
 unsigned long falseMax[ numElem ];
 unsigned long trueArray[ numElem ];
@@ -97,26 +97,28 @@ void loop() {
                                 }else if( slitCount > numElem ){
                                         slitCount = 0;
                                         elemCount = 0;                                        
-                                        initBool = false;
-                                        Serial.println(""); Serial.println("");
-                                        Serial.println( "falseMin: "  );
-                                        for( int i = 0; i < numElem; i++ ){
-                                                Serial.println( falseMin[ i ] );
-                                        }
-                                        Serial.println( "falseMax: " ); 
-                                        for( int i = 0; i < numElem; i++ ){
-                                                Serial.println( falseMax[ i ] );
-                                        }
-                                        // Serial.println( "tureTime: " ); 
-                                        // for( int i = 0; i < numElem; i++ ){
-                                        //         Serial.println( trueArray[ i ] );
-                                        // }                                        
+                                        initBool = false;                                        
                                         unsigned long _falseMin[ numElem - ( numSlit + 1 ) ]; // except first rotation
                                         unsigned long _falseMax[ numElem - ( numSlit + 1 ) ]; // except first rotation
                                         for( int i = 0; i < numElem - ( numSlit + 1 ); i++ ){
                                                 _falseMin[ i ] = falseMin[ i + ( numSlit + 1 ) ];     
                                                 _falseMax[ i ] = falseMax[ i + ( numSlit + 1 ) ];
                                         }
+                                        Serial.println(""); Serial.println("");
+                                        Serial.println( "falseMin: "  );
+                                        for( int i = 0; i < numElem - ( numSlit + 1 ); i++ ){
+                                                delay(10);
+                                                Serial.println( _falseMin[ i ] );
+                                        }
+                                        Serial.println( "falseMax: " ); 
+                                        for( int i = 0; i < numElem - ( numSlit + 1 ); i++ ){
+                                                delay(10);
+                                                Serial.println( _falseMax[ i ] );
+                                        }
+                                        // Serial.println( "tureTime: " ); 
+                                        // for( int i = 0; i < numElem; i++ ){
+                                        //         Serial.println( trueArray[ i ] );
+                                        // }
                                         float falseMinStd = stdev( _falseMin, numElem - ( numSlit + 1 ) ); // standard deviation
                                         float falseMaxStd = stdev( _falseMax, numElem - ( numSlit + 1 ) ); // standard deviation
                                         falseMinAve = exOutMean( _falseMin, falseMinStd, numElem - ( numSlit + 1 )); // mean except outliers
@@ -196,7 +198,7 @@ float exOutMean ( unsigned long x[], float xstdev, int xlength ){
         // except outliers mean
         unsigned long sum = 0;
         float ave = mean( x, xlength );
-        float exOutAve = 0;
+        //float exOutAve = 0;
         int n = 0;
         for( int i = 0; i < xlength; i++ ){
                 if( abs( (float)x[ i ] - ave ) <= 2*xstdev ){

@@ -1,48 +1,42 @@
 // get direction of the rotating disc by encoder  
-
-# define PIN_ENC_1 6
-# define PIN_ENC_2 7
+# define PIN_ENC 7
 # define PIN_BUSY 9
 # define PIN_LED 13
 
 const int numSlit = 8;
 
-boolean encVal1_cr;
-boolean encVal1_prv;
-boolean encVal2_cr;
-boolean encVal2_prv;
+boolean encVal_cr;
+boolean encVal_prv;
 
 int slitCount;
 unsigned long falseSrt;
 unsigned long falseEnd;
 unsigned long falseTime;
-// unsigned long trueSrt;
-// unsigned long trueEnd;
-// unsigned long trueTime;
+unsigned long trueSrt;
+unsigned long trueEnd;
+unsigned long trueTime;
 
 boolean initBool;
 float slitThd;
 
 void setup() {
         Serial.begin(2000000);
-        pinMode(PIN_ENC_1, INPUT);
-        pinMode(PIN_ENC_2, INPUT);
+        pinMode(PIN_ENC, INPUT);
         pinMode(PIN_LED, OUTPUT);
 
-        encVal1_prv = digitalRead(PIN_ENC_1);
-        encVal2_prv = digitalRead(PIN_ENC_2);
+        encVal_prv = digitalRead(PIN_ENC);
 
         initBool = true;
         slitCount = 0;
-        falseSrt = micros();   
-       // trueSrt = micros();     
+        falseSrt = micros();
+        trueSrt = micros();
         digitalWrite(PIN_LED, LOW);
 }
 
 void loop() {
         // get a BUSY flag from a motor driver.
+        // now, we use a stepping motor driven by L6470 and be waiting end of the acceleration.
         while( !digitalRead(PIN_BUSY)){ 
-               // now, we use a stepping motor driven by L6470 and be waiting end of the acceleration.
                initBool = true;       
                delay(10);
                Serial.println("busy_now");
@@ -50,14 +44,14 @@ void loop() {
 
         // get threshold of the magnification between wide slit and thin slit.
         if( initBool == true ){
-                unsigned int elemCount;
                 const int initRot = 5;
+                unsigned int elemCount;
                 const int numElem =  ( numSlit + 1 ) * initRot;
                 unsigned long falseNrrw[ numElem ];
                 unsigned long falseWid[ numElem ];
+                unsigned long trueArray[ numElem ];
                 float falseNrrwAve;
                 float falseWidAve;
-                //unsigned long trueArray[ numElem ];
 
                 slitCount = 0;
                 elemCount = 0;
@@ -67,24 +61,25 @@ void loop() {
                 }
 
                 while( initBool ){
-                        encVal2_cr = digitalRead(PIN_ENC_2); // in the slit area = false,  except area = true;
-                        if (encVal2_cr != encVal2_prv){
-                                if( encVal2_cr ==  false){ // start slit area 
+                        encVal_cr = digitalRead(PIN_ENC); // in the slit area = false,  except area = true;
+                        if (encVal_cr != encVal_prv){
+                                if( encVal_cr ==  false){ // start slit area 
                                         falseSrt = micros();
-                                        //trueEnd = micros(); 
-                                        //trueTime = trueEnd - trueSrt;
-                                        //trueArray[ elemCount ] = trueTime;
+                                        trueEnd = micros(); 
+                                        trueTime = trueEnd - trueSrt;
+                                        trueArray[ elemCount ] = trueTime;
                                         }
-                                if( encVal2_cr == true ){ // end slit area
-                                        //trueSrt = micros();
+                                if( encVal_cr == true ){ // end slit area
+                                        trueSrt = micros();
                                         falseEnd = micros();
                                         falseTime = falseEnd - falseSrt;
                                         Serial.print( "false: " ); Serial.println( falseTime ); 
-                                        //Serial.print( "true: " ); Serial.println( trueTime );                                  
+                                        Serial.print( "true: " ); Serial.println( trueTime );                                  
                                         slitCount += 1;
                                         if( slitCount <= numSlit+1 ){
                                                 // excpet first rotation 
                                         }else if( slitCount == 1 + (numSlit+1) ){
+                                                elemCount  = 0;
                                                 falseNrrw[0] = falseTime;
                                                 falseWid[0] = falseTime;
                                         }else if( slitCount <= numElem + (numSlit+1) ){
@@ -112,10 +107,10 @@ void loop() {
                                                         delay(10);
                                                         Serial.println( falseWid[ i ] );
                                                 }
-                                                //Serial.println( "tureTime: " ); 
-                                                //for( int i = 0; i < numElem; i++ ){
-                                                //        Serial.println( trueArray[ i ] );
-                                                //}
+                                                Serial.println( "tureTime: " ); 
+                                                for( int i = 0; i < numElem; i++ ){
+                                                        Serial.println( trueArray[ i ] );
+                                                }
                                                 float falseNrrwStd = stdev( falseNrrw, numElem ); // standard deviation
                                                 float falseWidStd = stdev( falseWid, numElem ); // standard deviation
                                                 falseNrrwAve = exoutMean( falseNrrw, falseNrrwStd, numElem ); // mean except outliers
@@ -130,27 +125,22 @@ void loop() {
                                          }
                                 }
                         }        
-                        encVal2_prv = encVal2_cr;
+                        encVal_prv = encVal_cr;
                 }
                 slitThd = falseWidAve / slitThd;                
         }
 
-        // get the current states of photo interrupter.
-        encVal1_cr = digitalRead(PIN_ENC_1); // in the slit area = false,  except area = true;
-        encVal2_cr = digitalRead(PIN_ENC_2); // in the slit area = false,  except area = true;
-
-        //
+        // get encoder state and count slit
         if( initBool == false ){
-                if( encVal2_cr != encVal2_prv ){
-                        if ( encVal2_cr == false ){
+                encVal_cr = digitalRead(PIN_ENC); // in the slit area = false,  except area = true;
+                if( encVal_cr != encVal_prv ){
+                        if ( encVal_cr == false ){
                                 falseSrt = micros();
-                                // trueEnd = micros(); 
-                                // trueTime = trueEnd - trueSrt;                 
-                                // Serial.print( "true: " );          
-                                // Serial.println( trueTime ); 
+                                trueEnd = micros(); 
+                                trueTime = trueEnd - trueSrt;                 
                         }
-                        if( encVal2_cr == true ){
-                                // trueSrt = micros();
+                        if( encVal_cr == true ){
+                                trueSrt = micros();
                                 falseEnd = micros();
                                 falseTime = falseEnd - falseSrt;
                                 if( falseTime  > slitThd ){
@@ -165,8 +155,8 @@ void loop() {
                                 Serial.print( "false: " ); Serial.println( falseTime );
                         }
                 }
+                encVal_prv = encVal_cr;
         }
-        encVal2_prv = encVal2_cr;
 }
 
 float mean( unsigned long x[], int xlength ){
@@ -193,7 +183,6 @@ float exoutMean ( unsigned long x[], float xstdev, int xlength ){
         // except outliers mean
         unsigned long sum = 0;
         float ave = mean( x, xlength );
-        //float exoutAve = 0;
         int n = 0;
         for( int i = 0; i < xlength; i++ ){
                 if( abs( (float)x[ i ] - ave ) <= 2*xstdev ){

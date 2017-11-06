@@ -1,3 +1,5 @@
+// L6470を用いて回転させた円板の向きを取得する
+
 // get direction of the rotating disc by encoder  
 # define PIN_ENC 7
 # define PIN_BUSY 9
